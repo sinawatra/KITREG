@@ -1,4 +1,10 @@
 import Image from 'next/image'
+import { RotatingText } from '@/components/ui/shadcn-io/rotating-text';
+import { ShimmeringText } from '@/components/ui/shadcn-io/shimmering-text';
+import { TypingText } from './ui/shadcn-io/typing-text';
+
+
+
 
 export function HeroSection() {
   return (
@@ -36,13 +42,27 @@ export function HeroSection() {
 
           {/* Right side - Main heading */}
           <div className="text-right flex-1 max-w-md ml-8">
-            <h1 className="text-4xl font-bold text-[#9B0000] italic mb-2">
-              In House Product<br />
-              Experience Sharing
-            </h1>
-            <h2 className="text-2xl font-bold text-[#9B0000] italic mb-4">
-              Collaborate, Not Compete
-            </h2>
+            <div className="text-4xl font-bold text-[#9B0000] italic mb-2">
+              <ShimmeringText
+                className="text-4xl font-semibold"
+                text="KITREG"
+                wave
+              />
+              <RotatingText
+                text={["In House Product", "Easy Scheduling", "Workshop Ready"]}
+                duration={2000}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+              />
+            </div>
+            <div className=" font-bold text-[#9B0000] italic mb-4">
+              <TypingText
+                className="text-2xl"
+                text="Collaborate, Not Compete"
+                cursor
+                cursorClassName="h-9"
+              />
+            </div>
+
             <p className="text-gray-600">
               Discover KIT activities, workshops, and Job Offers
             </p>
