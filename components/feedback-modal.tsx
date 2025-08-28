@@ -27,7 +27,7 @@ export function FeedbackModal({ isOpen, onClose, type, title, message }: Feedbac
             )}
           </div>
           <DialogTitle className={`text-xl text-center ${isSuccess ? "text-green-700" : "text-red-700"}`}>{title}</DialogTitle>
-          <DialogDescription className="text-gray-600 mt-2">{message}</DialogDescription>
+          <DialogDescription className="text-gray-600 mt-2 text-center">{message}</DialogDescription>
         </DialogHeader>
         <div className="flex justify-center mt-6">
           <Button

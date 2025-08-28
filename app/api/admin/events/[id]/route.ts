@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { createServerSupabaseClient, isAdmin } from "@/lib/serverUtils"
+import { cookies } from "next/headers"
 
 // GET a single workshop by ID
 export async function GET(request: Request, { params }: { params: { id: string } }) {
@@ -9,7 +10,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }
 
-  const id = params.id
+  // Properly access params after it's available
+  const id = await params.id
 
   const { data: workshop, error } = await supabase.from("workshops").select("*").eq("id", id).single()
 
@@ -27,15 +29,14 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
 // UPDATE a workshop (including status or other fields)
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = await createServerSupabaseClient()
 
-  if (!(await isAdmin(supabase))) {
+  if (!(await isAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
   }
 
   try {
-    const id = params.id
+    const id = await params.id
     const updates = await request.json() // Can contain any updatable fields
 
     const { data, error } = await supabase.from("workshops").update(updates).eq("id", id).select().single()
@@ -61,7 +62,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   }
 
   try {
-    const id = params.id
+    const id = await params.id
 
     const { error } = await supabase.from("workshops").delete().eq("id", id)
 

@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { MapPin, Calendar, Clock } from "lucide-react"
+import { supabase } from "@/lib/supabaseClient"
 
 interface Workshop {
   id: number
@@ -50,10 +51,65 @@ export function BookingModal({ workshop, isOpen, onClose, onConfirmBooking, isBo
     reason: "",
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Pass all form data to the parent's onConfirmBooking handler
-    onConfirmBooking(formData)
+    
+    try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id;
+      
+      if (!userId) {
+        alert("Please sign in to book a workshop");
+        return;
+      }
+
+      // When connected to your backend:
+      // await supabase.from('bookings').insert({
+      //   workshop_id: workshop.id,
+      //   user_id: userId,
+      //   name: formData.name,
+      //   email: formData.email,
+      //   phone: formData.phone,
+      //   student_id: formData.studentId,
+      //   reason: formData.reason
+      // })
+      
+      // For development (localStorage):
+      const savedWorkshops = localStorage.getItem("bookedWorkshops")
+        ? JSON.parse(localStorage.getItem("bookedWorkshops") as string)
+        : [];
+      
+      // Add user ID to the booking
+      savedWorkshops.push({
+        ...workshop,
+        userId: userId,  // Add the user ID to track who booked this
+        status: "Booked",
+        bookingDetails: formData
+      });
+      
+      localStorage.setItem('bookedWorkshops', JSON.stringify(savedWorkshops));
+      
+      console.log("Booking submitted:", { workshop: workshop?.id, userId, ...formData })
+      
+      // Reset form and close modal
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        studentId: "",
+        reason: "",
+      })
+      
+      // Call the onConfirmBooking prop and let the parent component handle success messaging
+      onConfirmBooking(formData)
+      
+      // Close the modal
+      onClose()
+    } catch (error) {
+      console.error("Error booking workshop:", error);
+      alert("There was an error booking the workshop. Please try again.");
+    }
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

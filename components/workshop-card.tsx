@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { MapPin, Calendar, Info, XCircle } from "lucide-react"
 import Image from "next/image"
 import { Loader2 } from "lucide-react"
+import React from "react"
 
 interface Workshop {
   id: number
@@ -17,139 +18,137 @@ interface Workshop {
   type: string
 }
 
-interface WorkshopCardProps {
+export interface WorkshopCardProps {
   workshop: Workshop
-  onBookNow: () => void
-  onCancelBooking?: () => void // Optional prop for cancel button
-  isCancelling?: boolean // Optional prop for cancel loading state
+  onBookNow?: () => void
+  onViewDetails?: () => void
+  onCancelBooking?: () => void
+  isCancelling?: boolean
+  showBookButton?: boolean
+  isDashboard?: boolean
 }
 
-export function WorkshopCard({ workshop, onBookNow, onCancelBooking, isCancelling }: WorkshopCardProps) {
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "open application":
-        return "bg-green-500 hover:bg-green-600 text-white" // Changed to green
-      case "closed":
-        return "bg-[#9B0000] hover:bg-[#8A0000] text-white"
-      case "done":
-        return "bg-gray-500 hover:bg-gray-600 text-white"
-      case "booked": // New status for user's booked tickets
-        return "bg-blue-500 hover:bg-blue-600 text-white"
-      default:
-        return "bg-gray-500 hover:bg-gray-600 text-white"
-    }
-  }
-
-  const getButtonText = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "open application":
-        return "Book Now"
-      case "closed":
-        return "Closed"
-      case "done":
-        return "Done"
-      case "booked":
-        return "View Details" // For booked workshops
-      default:
-        return "Book Now"
-    }
-  }
-
-  const isBookable = workshop.status.toLowerCase() === "open application"
-  const isBooked = workshop.status.toLowerCase() === "booked"
-
+export function WorkshopCard({
+  workshop,
+  onBookNow,
+  onViewDetails,
+  onCancelBooking,
+  isCancelling = false,
+  showBookButton = true,
+  isDashboard = false,
+}: WorkshopCardProps) {
   return (
-    <Card className="border-2 border-[#9B0000] rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
-      <CardContent className="p-0">
-        {/* Workshop Image */}
-        <div className="relative bg-white p-4">
-          <Image
-            src={workshop.image || "/placeholder.svg?height=120&width=280&text=YSEALI+seeds+for+the+future"}
-            alt={workshop.title}
-            width={280}
-            height={120}
-            className="w-full h-24 object-contain"
-          />
-        </div>
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+      {workshop.image && (
+        <img
+          src={workshop.image}
+          alt={workshop.title}
+          className="w-full h-48 object-cover"
+        />
+      )}
 
-        {/* Content Section */}
-        <div className="px-4 pb-4 space-y-3">
-          {/* Location and Date */}
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2 text-sm">
-              <MapPin className="w-4 h-4 text-[#9B0000]" />
-              <span className="text-gray-700 font-medium">{workshop.location}</span>
-            </div>
-            <div className="flex items-center space-x-2 text-sm">
-              <Calendar className="w-4 h-4 text-[#9B0000]" />
-              <span className="text-gray-700 font-medium">
-                {new Date(workshop.date)
-                  .toLocaleDateString("en-GB", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  })
-                  .replace(/ /g, ".")}
-              </span>
-            </div>
+      <div className="p-4">
+        <h3 className="text-lg font-bold text-gray-800">{workshop.title}</h3>
+
+        <div className="mt-2 space-y-2">
+          <div className="flex items-center text-sm text-gray-600">
+            <svg
+              className="w-4 h-4 mr-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            {workshop.date}
           </div>
 
-          {/* Title */}
-          <h3 className="font-semibold text-gray-900 text-sm leading-tight">{workshop.title}</h3>
+          <div className="flex items-center text-sm text-gray-600">
+            <svg
+              className="w-4 h-4 mr-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+            {workshop.location}
+          </div>
 
-          {/* Status Badge */}
-          <div className="flex justify-start">
-            <Badge className={`${getStatusColor(workshop.status)} text-xs px-3 py-1 rounded-full font-medium`}>
+          <div className="flex items-center text-sm">
+            <span
+              className={`px-2 py-1 rounded-full text-xs font-medium ${
+                workshop.status === "Available" && workshop.type === "Booked"
+                  ? "bg-green-100 text-green-800"
+             : workshop.status === "Done"
+    ? "bg-red-100 text-red-800"
+    : "bg-green-100 text-green-800"
+
+              }`}
+            >
               {workshop.status}
-            </Badge>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center space-x-2 pt-2">
-            {isBooked ? (
-              <>
-                <Button
-                  onClick={onBookNow}
-                  className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-6 py-2 rounded flex-1"
-                >
-                  {getButtonText(workshop.status)}
-                </Button>
-                {onCancelBooking && (
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={onCancelBooking}
-                    disabled={isCancelling}
-                    className="px-3 py-2 rounded flex items-center justify-center"
-                  >
-                    {isCancelling ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="w-4 h-4 mr-1" />}
-                    {isCancelling ? "" : "Cancel"}
-                  </Button>
-                )}
-              </>
-            ) : (
-              <>
-                <Button
-                  onClick={onBookNow}
-                  disabled={!isBookable}
-                  className={`${
-                    isBookable ? "bg-[#9B0000] hover:bg-[#8A0000]" : "bg-gray-400 cursor-not-allowed"
-                  } text-white text-sm font-medium px-6 py-2 rounded flex-1`}
-                >
-                  {getButtonText(workshop.status)}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="p-2 border-gray-300 rounded-full w-8 h-8 flex items-center justify-center bg-transparent"
-                >
-                  <Info className="w-4 h-4 text-gray-600" />
-                </Button>
-              </>
-            )}
+            </span>
+            <span className="ml-2 text-xs text-gray-500">
+              {workshop.type}
+            </span>
           </div>
         </div>
-      </CardContent>
-    </Card>
+
+        <div className="mt-4 flex justify-between">
+          {isDashboard ? (
+            <>
+              <button
+                onClick={onViewDetails}
+                className="px-4 py-2 text-sm font-medium bg-gray-100 text-gray-800 rounded hover:bg-gray-200"
+              >
+                View Details
+              </button>
+
+              <button
+                onClick={onCancelBooking}
+                disabled={isCancelling}
+                className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded hover:bg-red-700 disabled:bg-red-300"
+              >
+                {isCancelling ? "Cancelling..." : "Cancel"}
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={onViewDetails || onBookNow}
+                className="px-4 py-2 text-sm font-medium bg-gray-100 text-gray-800 rounded hover:bg-gray-200"
+              >
+                View Details
+              </button>
+
+              {showBookButton && workshop.status !== "Booked" && (
+                <button
+                  onClick={onBookNow}
+                  className="px-4 py-2 text-sm font-medium bg-[#9B0000] text-white rounded hover:bg-[#800000]"
+                >
+                  Book Now
+                </button>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
   )
 }

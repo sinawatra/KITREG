@@ -11,6 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import type { User } from "@supabase/supabase-js"
+import { Phase2Modal } from "./phase2-modal"
 
 
 interface UserProfile {
@@ -186,6 +187,15 @@ export function Header() {
   }
 
   const isLoading = isLoadingAuth || (user && isLoadingProfile)
+  const [phase2Modal, setPhase2Modal] = useState({ isOpen: false, feature: "" })
+
+  const showPhase2Modal = (feature: string) => {
+    setPhase2Modal({ isOpen: true, feature })
+  }
+
+  const closePhase2Modal = () => {
+    setPhase2Modal({ isOpen: false, feature: "" })
+  }
 
   return (
     <header className="bg-white">
@@ -200,18 +210,27 @@ export function Header() {
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/workshop" className="text-[#9B0000] hover:text-[#8A0000] font-medium">
+            <Link href="/" className="text-[#9B0000] hover:text-[#8A0000] font-medium">
               Workshop
             </Link>
-            <Link href="/job-offers" className="text-[#9B0000] hover:text-[#8A0000] font-medium">
+            <button 
+              onClick={() => showPhase2Modal("Job Offers")} 
+              className="text-[#9B0000] hover:text-[#8A0000] font-medium cursor-pointer bg-transparent border-none"
+            >
               Job Offers
-            </Link>
-            <Link href="/announcement" className="text-[#9B0000] hover:text-[#8A0000] font-medium">
+            </button>
+            <button 
+              onClick={() => showPhase2Modal("Announcement")} 
+              className="text-[#9B0000] hover:text-[#8A0000] font-medium cursor-pointer bg-transparent border-none"
+            >
               Announcement
-            </Link>
-            <Link href="/activity" className="text-[#9B0000] hover:text-[#8A0000] font-medium">
+            </button>
+            <button 
+              onClick={() => showPhase2Modal("Activity")} 
+              className="text-[#9B0000] hover:text-[#8A0000] font-medium cursor-pointer bg-transparent border-none"
+            >
               Activity
-            </Link>
+            </button>
           </nav>
 
           {/* User Profile or Login Button */}
@@ -269,6 +288,13 @@ export function Header() {
           </div>
         </div>
       </div>
+
+      {/* Phase 2 Modal */}
+      <Phase2Modal
+        isOpen={phase2Modal.isOpen}
+        onClose={closePhase2Modal}
+        feature={phase2Modal.feature}
+      />
     </header>
   )
 }
