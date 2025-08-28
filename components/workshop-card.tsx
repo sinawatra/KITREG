@@ -92,21 +92,24 @@ export function WorkshopCard({
           </div>
 
           <div className="flex items-center text-sm">
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                workshop.status === "Available" && workshop.type === "Booked"
-                  ? "bg-green-100 text-green-800"
-             : workshop.status === "Done"
-    ? "bg-red-100 text-red-800"
-    : "bg-green-100 text-green-800"
+        <span
+  className={`px-2 py-1 rounded-full text-xs font-medium ${
+    workshop.status === "Available" && workshop.type === "Booked"
+      ? "bg-green-100 text-green-800"
+      : workshop.status === "Done"
+        ? "bg-red-100 text-red-800"
+        : workshop.status === "Closed"
+          ? "bg-gray-100 text-gray-500"
+          : "bg-green-100 text-green-800" // default/fallback
+  }`}
+>
+  {workshop.status}
+</span>
+    
+           <span className="ml-2 text-xs text-black-500 font-bold">
+  {workshop.type.toUpperCase()}
+</span>
 
-              }`}
-            >
-              {workshop.status}
-            </span>
-            <span className="ml-2 text-xs text-gray-500">
-              {workshop.type}
-            </span>
           </div>
         </div>
 

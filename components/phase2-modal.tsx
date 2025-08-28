@@ -16,9 +16,9 @@ export function Phase2Modal({ isOpen, onClose, feature }: Phase2ModalProps) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="text-center">
           <div className="mx-auto mb-4">
-            <Clock className="h-16 w-16 text-blue-500" />
+            <Clock className="h-16 w-16 text-red-500" />
           </div>
-          <DialogTitle className="text-xl text-center text-blue-700">Coming Soon!</DialogTitle>
+          <DialogTitle className="text-xl text-center text-red-700">Coming Soon!</DialogTitle>
           <DialogDescription className="text-gray-600 mt-2 text-center">
             The <span className="font-semibold">{feature}</span> feature will be available in Phase 2 of our development.
             <br /><br />
@@ -26,7 +26,7 @@ export function Phase2Modal({ isOpen, onClose, feature }: Phase2ModalProps) {
           </DialogDescription>
         </DialogHeader>
         <div className="flex justify-center mt-6">
-          <Button onClick={onClose} className="px-8 bg-blue-600 hover:bg-blue-700">
+          <Button onClick={onClose} className="px-8 bg-red-600 hover:bg-red-700">
             OK
           </Button>
         </div>

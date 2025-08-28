@@ -100,16 +100,16 @@ export default function CreateEventPage() {
     createWorkshopMutation.mutate(formData)
   }
 
-  const predefinedImages = [
-    { name: "Seeds for Future", path: "/images/seeds-for-the-future-logo.png" },
-    { name: "AI Workshop", path: "/images/ai-workshop.png" },
-    { name: "Data Science", path: "/images/data-science-workshop.png" },
-    { name: "Career Seeds", path: "/images/future-career-seeds.png" },
-    { name: "Tech Seeds", path: "/images/future-tech-seeds.png" },
-    { name: "Innovation Seeds", path: "/images/future-innovation-seeds.png" },
-    { name: "Startup Seeds", path: "/images/future-startup-seeds.png" },
-    { name: "Marketing Seeds", path: "/images/seeds-future-marketing.png" },
-  ]
+  // const predefinedImages = [
+  //   { name: "Seeds for Future", path: "/images/seeds-for-the-future-logo.png" },
+  //   { name: "AI Workshop", path: "/images/ai-workshop.png" },
+  //   { name: "Data Science", path: "/images/data-science-workshop.png" },
+  //   { name: "Career Seeds", path: "/images/future-career-seeds.png" },
+  //   { name: "Tech Seeds", path: "/images/future-tech-seeds.png" },
+  //   { name: "Innovation Seeds", path: "/images/future-innovation-seeds.png" },
+  //   { name: "Startup Seeds", path: "/images/future-startup-seeds.png" },
+  //   { name: "Marketing Seeds", path: "/images/seeds-future-marketing.png" },
+  // ]
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
