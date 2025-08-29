@@ -4,12 +4,30 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import StatusBadge from "@/components/prismui/status-badge"
 import { useQuery } from "@tanstack/react-query"
 import { useParams } from "next/navigation"
 import { format } from "date-fns"
 import { Loader2, ArrowLeft, Users, Calendar, MapPin, Download } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+
+// Helper function to map workshop status to StatusBadge variant
+const getStatusVariant = (status: string): "pending" | "completed" | "failed" | "processing" | "draft" => {
+  switch (status.toLowerCase()) {
+    case "open application":
+      return "completed";
+    case "booked":
+      return "processing";
+    case "done":
+      return "failed";
+    case "cancelled":
+    case "closed":
+      return "draft";
+    default:
+      return "pending";
+  }
+}
 
 interface Booking {
   id: string
@@ -31,30 +49,61 @@ interface Workshop {
 }
 
 async function fetchWorkshopBookings(workshopId: string): Promise<Booking[]> {
-  const response = await fetch(`/api/admin/events/${workshopId}/bookings`, { 
-    credentials: "include"
-  })
-  if (!response.ok) {
-    const errorData = await response.json()
-    throw new Error(errorData.error || "Failed to fetch bookings")
+  try {
+    const response = await fetch(`/api/admin/events/${workshopId}/bookings`, { 
+      credentials: "include" 
+    })
+    
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || "Failed to fetch bookings")
+    }
+    
+    return response.json()
+  } catch (error) {
+    console.error("Error fetching bookings:", error)
+    throw error
   }
-  return response.json()
 }
 
 async function fetchWorkshopDetails(workshopId: string): Promise<Workshop> {
-  const response = await fetch(`/api/admin/events/${workshopId}`, {
-    credentials: "include"
-  })
-  if (!response.ok) {
-    const errorData = await response.json()
-    throw new Error(errorData.error || "Failed to fetch workshop details")
+  try {
+    const response = await fetch(`/api/admin/events/${workshopId}`, {
+      credentials: "include"
+    })
+    
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || "Failed to fetch workshop details")
+    }
+    
+    return response.json()
+  } catch (error) {
+    console.error("Error fetching workshop details:", error)
+    throw error
   }
-  return response.json()
 }
 
 export default function EventBookingsPage() {
   const params = useParams()
   const workshopId = params.id as string
+  
+  // Make sure we have a valid workshopId
+  if (!workshopId) {
+    return (
+      <div className="text-center py-8">
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4 max-w-lg mx-auto">
+          <p className="text-amber-700 font-medium">Missing event ID</p>
+          <p className="text-amber-600 mt-2">Unable to load event details without an ID</p>
+        </div>
+        <Link href="/admin/dashboard/events">
+          <Button variant="outline" className="mt-4 bg-transparent">
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Events
+          </Button>
+        </Link>
+      </div>
+    )
+  }
 
   const {
     data: bookings,
@@ -64,6 +113,17 @@ export default function EventBookingsPage() {
   } = useQuery<Booking[], Error>({
     queryKey: ["workshopBookings", workshopId],
     queryFn: () => fetchWorkshopBookings(workshopId),
+    retry: (failureCount, error) => {
+      // Don't retry on 404 (not found) or 403 (unauthorized)
+      if (
+        error instanceof Error && 
+        error.message.includes("404") || 
+        error.message.includes("403")
+      ) {
+        return false;
+      }
+      return failureCount < 3;
+    }
   })
 
   const {
@@ -74,6 +134,17 @@ export default function EventBookingsPage() {
   } = useQuery<Workshop, Error>({
     queryKey: ["workshopDetails", workshopId],
     queryFn: () => fetchWorkshopDetails(workshopId),
+    retry: (failureCount, error) => {
+      // Don't retry on 404 (not found) or 403 (unauthorized)
+      if (
+        error instanceof Error && 
+        error.message.includes("404") || 
+        error.message.includes("403")
+      ) {
+        return false;
+      }
+      return failureCount < 3;
+    }
   })
 
   const exportBookings = () => {
@@ -104,17 +175,21 @@ export default function EventBookingsPage() {
 
   if (isLoadingBookings || isLoadingDetails) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-[#9B0000]" />
-        <p className="ml-2 text-gray-700">Loading event details...</p>
+      <div className="flex flex-col justify-center items-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-[#9B0000] mb-4" />
+        <p className="text-gray-700">Loading event details and bookings...</p>
+        <p className="text-gray-500 text-sm mt-2">Please wait while we fetch the data</p>
       </div>
     )
   }
 
   if (isErrorBookings || isErrorDetails) {
     return (
-      <div className="text-center py-8 text-red-600">
-        <p>Error loading data: {bookingsError?.message || detailsError?.message}</p>
+      <div className="text-center py-8">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 max-w-lg mx-auto">
+          <p className="text-red-600 font-medium mb-2">Error loading data:</p>
+          <p className="text-red-500">{bookingsError?.message || detailsError?.message}</p>
+        </div>
         <Link href="/admin/dashboard/events">
           <Button variant="outline" className="mt-4 bg-transparent">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Events
@@ -177,15 +252,10 @@ export default function EventBookingsPage() {
                   </div>
                 </div>
               </div>
-              <Badge
-                className={
-                  workshopDetails.status === "Open Application"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
-                }
-              >
-                {workshopDetails.status}
-              </Badge>
+              <StatusBadge 
+                status={getStatusVariant(workshopDetails.status)}
+                label={workshopDetails.status}
+              />
             </div>
           </CardContent>
         </Card>
