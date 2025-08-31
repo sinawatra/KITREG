@@ -6,8 +6,9 @@ import Image from "next/image"
 import { supabase } from "@/lib/supabaseClient"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Bell, UserIcon, LogOut } from "lucide-react"
+import { UserIcon, LogOut } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { NotificationBell } from "@/components/notification-bell"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import type { User } from "@supabase/supabase-js"
@@ -239,14 +240,9 @@ export function Header() {
               <div className="h-8 w-24 bg-gray-200 animate-pulse rounded-full"></div>
             ) : user ? (
               <>
-                {/* Notification Bell */}
-                <Button variant="ghost" size="icon" className="relative">
-                  <Bell className="h-5 w-5 text-gray-600" />
-                  <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
-                    2
-                  </span>
-                </Button>
-
+                {/* Notification Bell with Announcements */}
+                <NotificationBell />
+                
                 {/* User Profile Dropdown */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
