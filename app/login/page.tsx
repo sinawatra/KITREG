@@ -1,9 +1,9 @@
+"use client";
+
 import { LoginForm } from '@/components/login-form'
 import Link from 'next/link'
 import { Suspense } from 'react'
-
 import Image from 'next/image'
-"use client";
 
 
 export default function LoginPage() {
