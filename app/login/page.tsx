@@ -1,5 +1,6 @@
 import { LoginForm } from '@/components/login-form'
 import Link from 'next/link'
+import { Suspense } from 'react'
 
 import Image from 'next/image'
 "use client";
@@ -36,7 +37,9 @@ return (
     {/* Main Content */}
     <div className="flex items-center justify-center py-12 px-4">
       <div className="w-full max-w-md">
-        <LoginForm />
+        <Suspense fallback={<div className="text-center">Loading...</div>}>
+          <LoginForm />
+        </Suspense>
       </div>
     </div>
   </div>
