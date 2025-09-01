@@ -1,6 +1,9 @@
 import { LoginForm } from '@/components/login-form'
 import Link from 'next/link'
+
 import Image from 'next/image'
+"use client";
+
 
 export default function LoginPage() {
 return (
