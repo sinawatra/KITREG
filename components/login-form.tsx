@@ -224,13 +224,13 @@ export function LoginForm() {
           )}
 
           {/* Forgot Password Link (Login Only) */}
-          {isLogin && (
+          {/* {isLogin && (
             <div className="text-right">
               <Link href="/forgot-password" className="text-sm text-[#9B0000] hover:text-[#8A0000] hover:underline">
                 Forgot your password?
               </Link>
             </div>
-          )}
+          )} */}
 
           {/* Submit Button */}
           <Button type="submit" className="w-full bg-[#9B0000] hover:bg-[#8A0000] text-white py-2" disabled={loading}>
@@ -249,7 +249,7 @@ export function LoginForm() {
         </div>
 
         {/* Google Sign In Button */}
-        <Button
+        {/* <Button
           type="button"
           variant="outline"
           onClick={handleGoogleSignIn}
@@ -275,7 +275,7 @@ export function LoginForm() {
             />
           </svg>
           Continue with Google
-        </Button>
+        </Button> */}
       </CardContent>
 
       <CardFooter className="text-center">
