@@ -3,7 +3,7 @@ import { cookies } from "next/headers"
 import { createServerClient } from "@supabase/ssr"
 
 // Helper function to create a server-side Supabase client
-function createClient(cookieStore: ReturnType<typeof cookies>) {
+function createClient(cookieStore: Awaited<ReturnType<typeof cookies>>) {
   return createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
     cookies: {
       get(name: string) {
@@ -31,13 +31,13 @@ async function isAdmin(supabase: ReturnType<typeof createClient>): Promise<boole
 }
 
 export async function GET() {
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const supabase = createClient(cookieStore)
 
   const testResults = {
     timestamp: new Date().toISOString(),
     admin_check: false,
-    tests: [],
+    tests: [] as any[],
   }
 
   try {
