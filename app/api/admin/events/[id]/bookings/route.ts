@@ -56,7 +56,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const formattedBookings = bookings.map((booking) => ({
       id: booking.id,
       booked_at: booking.booked_at,
-      user_name: booking.profiles?.name || booking.name || "N/A",
+      user_name:  booking.first_name || "N/A",
       user_email: booking.email_address || booking.email || "N/A", // Use email from booking record
       student_id: booking.student_id || "N/A",
       phone_number: booking.phone_number || "N/A",
