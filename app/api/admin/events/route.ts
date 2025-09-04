@@ -41,7 +41,6 @@ export async function GET() {
   const { data: workshops, error } = await supabase.from("workshops").select("*").order("date", { ascending: true })
 
   if (error) {
-    console.error("Error fetching workshops:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
@@ -69,13 +68,11 @@ export async function POST(request: Request) {
       .single()
 
     if (error) {
-      console.error("Error creating workshop:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ message: "Workshop created successfully!", data }, { status: 201 })
   } catch (error: any) {
-    console.error("API error:", error)
     return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 })
   }
 }

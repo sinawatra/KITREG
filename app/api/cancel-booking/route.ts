@@ -23,13 +23,11 @@ export async function DELETE(request: Request) {
     const { error } = await supabase.from("bookings").delete().eq("user_id", user.id).eq("workshop_id", workshopId)
 
     if (error) {
-      console.error("Supabase delete error:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ message: "Booking cancelled successfully!" }, { status: 200 })
   } catch (error: any) {
-    console.error("Cancel booking API error:", error)
     return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 })
   }
 }

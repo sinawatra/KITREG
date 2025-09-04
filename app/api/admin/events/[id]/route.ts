@@ -16,7 +16,6 @@ export async function GET(request: Request, { params }: { params: { id: string }
   const { data: workshop, error } = await supabase.from("workshops").select("*").eq("id", id).single()
 
   if (error) {
-    console.error("Error fetching workshop:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
@@ -42,13 +41,11 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     const { data, error } = await supabase.from("workshops").update(updates).eq("id", id).select().single()
 
     if (error) {
-      console.error("Error updating workshop:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ message: "Workshop updated successfully!", data }, { status: 200 })
   } catch (error: any) {
-    console.error("API error:", error)
     return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 })
   }
 }
@@ -67,13 +64,11 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     const { error } = await supabase.from("workshops").delete().eq("id", id)
 
     if (error) {
-      console.error("Error deleting workshop:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ message: "Workshop deleted successfully!" }, { status: 200 })
   } catch (error: any) {
-    console.error("API error:", error)
     return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 })
   }
 }

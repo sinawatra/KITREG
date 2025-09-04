@@ -6,14 +6,14 @@ import { createServerClient } from "@supabase/ssr"
 function createClient(cookieStore: ReturnType<typeof cookies>) {
   return createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
     cookies: {
-      get(name: string) {
-        return cookieStore.get(name)?.value
+      async get(name: string) {
+        return (await cookieStore).get(name)?.value
       },
-      set(name: string, value: string, options: any) {
-        cookieStore.set({ name, value, ...options })
+      async set(name: string, value: string, options: any) {
+         (await cookieStore).set({ name, value, ...options })
       },
-      remove(name: string, options: any) {
-        cookieStore.set({ name, value: "", ...options })
+      async remove(name: string, options: any) {
+         (await cookieStore).set({ name, value: "", ...options })  
       },
     },
   })
@@ -66,7 +66,6 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       .single()
 
     if (error) {
-      console.error("Error updating admin status:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -75,7 +74,6 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       data,
     })
   } catch (error: any) {
-    console.error("API error:", error)
     return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 })
   }
 }

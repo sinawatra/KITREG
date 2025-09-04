@@ -46,7 +46,6 @@ async function updateWorkshop(workshop: Partial<Workshop> & { id: number }): Pro
   })
   if (!response.ok) {
     let errorText = await response.text()
-    console.error("Update failed:", response.status, errorText)
     let errorData
     try {
       errorData = JSON.parse(errorText)

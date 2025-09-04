@@ -91,8 +91,6 @@ export function BookingModal({ workshop, isOpen, onClose, onConfirmBooking, isBo
         throw new Error(errorData.error || 'Failed to book workshop');
       }
       
-      console.log("Booking submitted successfully:", { workshop: workshop?.id, userId, ...formData })
-      
       // Reset form and close modal
       setFormData({
         name: "",
@@ -108,7 +106,6 @@ export function BookingModal({ workshop, isOpen, onClose, onConfirmBooking, isBo
       // Close the modal
       onClose()
     } catch (error) {
-      console.error("Error booking workshop:", error);
       alert("There was an error booking the workshop. Please try again.");
     }
   }

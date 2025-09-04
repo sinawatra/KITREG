@@ -33,7 +33,6 @@ async function fetchAdminProfile(): Promise<UserProfile | null> {
   const { data, error } = await supabase.from("profiles").select("name, is_admin").eq("id", user.id).single()
 
   if (error) {
-    console.error("Error fetching admin profile:", error)
     return null
   }
   return data

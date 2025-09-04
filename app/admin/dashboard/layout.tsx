@@ -52,7 +52,6 @@ export default async function AdminDashboardLayout({
       </QueryProvider>
     );
   } catch (error) {
-    console.error("Admin dashboard layout error:", error);
     redirect("/admin/login");
     return null; // This will never be reached, but TypeScript needs it
   }

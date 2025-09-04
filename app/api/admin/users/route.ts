@@ -53,7 +53,6 @@ export async function GET() {
       .order("updated_at", { ascending: false })
 
     if (error) {
-      console.error("Error fetching profiles:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -70,7 +69,6 @@ export async function GET() {
 
     return NextResponse.json(usersWithData)
   } catch (error: any) {
-    console.error("Unexpected error fetching users:", error)
     return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 })
   }
 }

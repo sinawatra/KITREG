@@ -152,31 +152,17 @@ const fallbackWorkshops = [
 export async function GET() {
   const supabase = await createServerSupabaseClient()
 
-  console.log("=== WORKSHOPS API DEBUG ===")
-  console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL)
-  console.log("Supabase Key exists:", !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-
   try {
     const { data: workshops, error } = await supabase.from("workshops").select("*").order("date", { ascending: true })
 
-    console.log("Database query result:")
-    console.log("- Error:", error)
-    console.log("- Data count:", workshops?.length || 0)
-    console.log("- First workshop:", workshops?.[0])
-
     if (error) {
-      console.error("Error fetching workshops from Supabase:", error)
       // Fallback to hardcoded data if there's a database error
-      console.log("Falling back to hardcoded data")
       return NextResponse.json(fallbackWorkshops)
     }
 
-    console.log("Returning workshops from database")
     return NextResponse.json(workshops)
   } catch (e: any) {
-    console.error("Unexpected error in /api/workshops:", e)
     // Fallback to hardcoded data for any unexpected errors
-    console.log("Falling back to hardcoded data due to exception")
     return NextResponse.json(fallbackWorkshops)
   }
 }

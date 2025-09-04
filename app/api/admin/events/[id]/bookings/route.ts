@@ -48,7 +48,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       .order("booked_at", { ascending: false })
 
     if (error) {
-      console.error("Error fetching bookings for workshop:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -65,7 +64,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
     return NextResponse.json(formattedBookings)
   } catch (error: any) {
-    console.error("API error:", error)
     return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 })
   }
 }
