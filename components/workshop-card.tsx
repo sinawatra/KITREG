@@ -123,13 +123,13 @@ export function WorkshopCard({
                 View Details
               </button>
 
-              <button
+              {/* <button
                 onClick={onCancelBooking}
                 disabled={isCancelling}
                 className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded hover:bg-red-700 disabled:bg-red-300"
               >
                 {isCancelling ? "Cancelling..." : "Cancel"}
-              </button>
+              </button> */}
             </>
           ) : (
             <>

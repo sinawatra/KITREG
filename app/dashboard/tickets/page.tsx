@@ -161,7 +161,7 @@ export default function TicketsPage() {
     onSuccess: (data, workshopId) => {
       console.log('Cancel booking successful, invalidating queries')
       queryClient.invalidateQueries({ queryKey: ['bookedWorkshops', currentUserId] })
-      alert('Booking cancelled successfully!')
+      alert('Booking cancelled successfully!, We will removed from the ticket lists when the admin is confirmed ')
     },
     onError: (error: any) => {
       console.error('Cancel booking error:', error)
