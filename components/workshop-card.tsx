@@ -38,7 +38,7 @@ export function WorkshopCard({
   isDashboard = false,
 }: WorkshopCardProps) {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
       {workshop.image && (
         <img
           src={workshop.image}
@@ -47,7 +47,7 @@ export function WorkshopCard({
         />
       )}
 
-      <div className="p-4">
+      <div className="p-4 flex flex-col flex-grow">
         <h3 className="text-lg font-bold text-gray-800">{workshop.title}</h3>
 
         <div className="mt-2 space-y-2">
@@ -113,7 +113,7 @@ export function WorkshopCard({
           </div>
         </div>
 
-        <div className="mt-4 flex gap-2">
+        <div className="mt-auto pt-4 pb-2 flex gap-2">
           {isDashboard ? (
             <>
               <button
