@@ -64,33 +64,34 @@ export function BookingModal({ workshop, isOpen, onClose, onConfirmBooking, isBo
         return;
       }
 
-      // When connected to your backend:
-      // await supabase.from('bookings').insert({
-      //   workshop_id: workshop.id,
-      //   user_id: userId,
-      //   name: formData.name,
-      //   email: formData.email,
-      //   phone: formData.phone,
-      //   student_id: formData.studentId,
-      //   reason: formData.reason
-      // })
+      if (!workshop) {
+        alert("Workshop information is missing");
+        return;
+      }
       
-      // For development (localStorage):
-      const savedWorkshops = localStorage.getItem("bookedWorkshops")
-        ? JSON.parse(localStorage.getItem("bookedWorkshops") as string)
-        : [];
-      
-      // Add user ID to the booking
-      savedWorkshops.push({
-        ...workshop,
-        userId: userId,  // Add the user ID to track who booked this
-        status: "Booked",
-        bookingDetails: formData
+      // Submit booking to database via API
+      const response = await fetch('/api/book-workshop', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          workshopId: workshop.id,
+          name: formData.name,
+          studentId: formData.studentId,
+          email: formData.email,
+          phone: formData.phone,
+          reason: formData.reason
+        })
       });
       
-      localStorage.setItem('bookedWorkshops', JSON.stringify(savedWorkshops));
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to book workshop');
+      }
       
-      console.log("Booking submitted:", { workshop: workshop?.id, userId, ...formData })
+      console.log("Booking submitted successfully:", { workshop: workshop?.id, userId, ...formData })
       
       // Reset form and close modal
       setFormData({

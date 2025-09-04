@@ -6,9 +6,13 @@ import { QueryProvider } from '@/components/query-provider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'KIT REG Landing Page',
+  title: 'KIT REG - CMS',
   description: 'Landing page for Kirirom Institute of Technology events and workshops',
-    generator: 'v0.app'
+  generator: 'KITREG',
+  icons: {
+    icon: '/images/kirirom-institute-of-technology.png',
+
+  },
 }
 
 export default function RootLayout({

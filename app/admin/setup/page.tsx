@@ -129,14 +129,13 @@ export default function AdminSetupPage() {
                     </div>
                     <div className="space-x-2">
                       {!user.is_admin ? (
-                        <Button
-                          size="sm"
-                          onClick={() => makeAdmin(user.id)}
-                          disabled={loading}
-                          className="bg-green-600 hover:bg-green-700"
-                        >
-                          Make Admin
-                        </Button>
+                     <Button
+                      size="sm"
+                      onClick={loading ? undefined : () => makeAdmin(user.id)} 
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      Make Admin
+                    </Button>
                       ) : (
                         <Button size="sm" variant="destructive" onClick={() => removeAdmin(user.id)} disabled={loading}>
                           Remove Admin

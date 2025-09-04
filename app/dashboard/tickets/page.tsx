@@ -19,34 +19,63 @@ interface Workshop {
   userId?: string // Add userId to track who booked this workshop
 }
 
-// Modified to fetch only the current user's bookings
-const fetchBookedWorkshops = async () => {
+// Modified to fetch only the current user's bookings from database
+const fetchBookedWorkshops = async (userId: string) => {
   try {
-    // Get current user
-    const { data: { user } } = await supabase.auth.getUser();
-    const userId = user?.id;
-    
     if (!userId) {
-      console.log("No user logged in");
+      console.log("No user ID provided");
       return [];
     }
     
-    // For development: retrieve from localStorage and filter by userId
-    const savedWorkshops = localStorage.getItem('bookedWorkshops')
-    if (savedWorkshops) {
-      const allWorkshops = JSON.parse(savedWorkshops) as Workshop[];
-      // Only return workshops booked by the current user
-      return allWorkshops.filter(workshop => workshop.userId === userId);
+    // Fetch bookings and then get workshop details
+    console.log("Fetching bookings for user ID:", userId);
+    const { data: bookings, error: bookingsError } = await supabase
+      .from('bookings')
+      .select('workshop_id, user_id')
+      .eq('user_id', userId);
+    
+    if (bookingsError) {
+      console.error("Error fetching bookings:", bookingsError);
+      return [];
     }
     
-    // When you connect to your backend, replace this with:
-    // const { data, error } = await supabase
-    //   .from('bookings')
-    //   .select('*')
-    //   .eq('user_id', userId)
-    //   .join('workshops', { foreignKey: 'workshop_id' })
+    console.log("Bookings found:", bookings);
     
-    return []
+    if (!bookings || bookings.length === 0) {
+      console.log("No bookings found for user:", userId);
+      return [];
+    }
+    
+    // Get workshop IDs from bookings
+    const workshopIds = bookings.map(booking => booking.workshop_id);
+    console.log("Workshop IDs from bookings:", workshopIds);
+    
+    // Fetch workshop details
+    const { data: workshopsData, error: workshopsError } = await supabase
+      .from('workshops')
+      .select('id, title, status, image, location, date, type')
+      .in('id', workshopIds);
+    
+    if (workshopsError) {
+      console.error("Error fetching workshops:", workshopsError);
+      return [];
+    }
+    
+    console.log("Workshop details fetched:", workshopsData);
+    
+    // Transform the data to match the Workshop interface
+    const workshops = workshopsData?.map(workshop => ({
+      id: workshop.id,
+      title: workshop.title,
+      status: workshop.status,
+      image: workshop.image,
+      location: workshop.location,
+      date: workshop.date,
+      type: workshop.type,
+      userId: userId
+    })) || [];
+    
+    return workshops;
   } catch (error) {
     console.error("Error fetching booked workshops:", error);
     return [];
@@ -59,41 +88,84 @@ export default function TicketsPage() {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false)
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   
-  // Fetch current user
+  // Fetch current user and listen for auth changes
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setCurrentUserId(user?.id || null);
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) {
+          console.error('Error fetching user:', error);
+          setCurrentUserId(null);
+        } else {
+          setCurrentUserId(user?.id || null);
+        }
+      } catch (error) {
+        console.error('Error in fetchUser:', error);
+        setCurrentUserId(null);
+      }
     };
     
+    // Initial fetch
     fetchUser();
+    
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.id);
+        setCurrentUserId(session?.user?.id || null);
+      }
+    );
+    
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
   
   // Use React Query to fetch and cache booked workshops
   const { data: bookedWorkshops = [], isLoading, isError } = useQuery({
     queryKey: ['bookedWorkshops', currentUserId],
-    queryFn: fetchBookedWorkshops,
+    queryFn: () => {
+      console.log('React Query calling fetchBookedWorkshops with userId:', currentUserId);
+      return fetchBookedWorkshops(currentUserId!);
+    },
     enabled: !!currentUserId, // Only run the query if we have a user ID
+    retry: 1,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   })
+  
+  console.log('TicketsPage - currentUserId:', currentUserId, 'bookedWorkshops:', bookedWorkshops, 'isLoading:', isLoading, 'isError:', isError);
   
   const queryClient = useQueryClient()
   
   const cancelMutation = useMutation({
     mutationFn: async (workshopId: number) => {
-      // When connected to your backend:
-      // await supabase.from('bookings').delete().eq('workshop_id', workshopId).eq('user_id', currentUserId)
+      console.log('Cancelling booking for workshop ID:', workshopId)
+      const response = await fetch('/api/cancel-booking', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ workshopId })
+      })
       
-      // For development:
-      const current = localStorage.getItem('bookedWorkshops') 
-        ? JSON.parse(localStorage.getItem('bookedWorkshops') as string) 
-        : []
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to cancel booking')
+      }
       
-      const updated = current.filter((w: Workshop) => !(w.id === workshopId && w.userId === currentUserId))
-      localStorage.setItem('bookedWorkshops', JSON.stringify(updated))
-      return workshopId
+      const result = await response.json()
+      console.log('Cancel booking response:', result)
+      return result
     },
-    onSuccess: () => {
+    onSuccess: (data, workshopId) => {
+      console.log('Cancel booking successful, invalidating queries')
       queryClient.invalidateQueries({ queryKey: ['bookedWorkshops', currentUserId] })
+      alert('Booking cancelled successfully!')
+    },
+    onError: (error: any) => {
+      console.error('Cancel booking error:', error)
+      alert(`Failed to cancel booking: ${error.message}`)
     }
   })
 
@@ -216,24 +288,7 @@ export default function TicketsPage() {
               </div>
             </div>
             
-            <div className="mt-6 flex justify-end">
-              <button
-                onClick={() => setIsDetailsModalOpen(false)}
-                className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
-              >
-                Close
-              </button>
-              <button
-                onClick={() => {
-                  setIsDetailsModalOpen(false)
-                  handleCancelBooking(selectedWorkshop.id, selectedWorkshop.title)
-                }}
-                className="px-4 py-2 ml-2 bg-red-600 text-white rounded hover:bg-red-700"
-                disabled={cancelMutation.isPending}
-              >
-                {cancelMutation.isPending ? 'Cancelling...' : 'Cancel Booking'}
-              </button>
-            </div>
+
           </div>
         </div>
       )}
