@@ -113,12 +113,12 @@ export function WorkshopCard({
           </div>
         </div>
 
-        <div className="mt-4 flex justify-between">
+        <div className="mt-4 flex gap-2">
           {isDashboard ? (
             <>
               <button
                 onClick={onViewDetails}
-                className="px-4 py-2 text-sm font-medium bg-gray-100 text-gray-800 rounded hover:bg-gray-200"
+                className="flex-1 px-4 py-2 text-sm font-medium bg-gray-100 text-gray-800 rounded hover:bg-gray-200 min-h-[36px] flex items-center justify-center"
               >
                 View Details
               </button>
@@ -126,7 +126,7 @@ export function WorkshopCard({
               {/* <button
                 onClick={onCancelBooking}
                 disabled={isCancelling}
-                className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded hover:bg-red-700 disabled:bg-red-300"
+                className="flex-1 px-4 py-2 text-sm font-medium bg-red-600 text-white rounded hover:bg-red-700 disabled:bg-red-300 min-h-[36px] flex items-center justify-center"
               >
                 {isCancelling ? "Cancelling..." : "Cancel"}
               </button> */}
@@ -135,7 +135,7 @@ export function WorkshopCard({
             <>
               <button
                 onClick={onViewDetails || onBookNow}
-                className="px-4 py-2 text-sm font-medium bg-gray-100 text-gray-800 rounded hover:bg-gray-200"
+                className="flex-1 px-4 py-2 text-sm font-medium bg-gray-100 text-gray-800 rounded hover:bg-gray-200 min-h-[36px] flex items-center justify-center"
               >
                 View Details
               </button>
@@ -143,7 +143,7 @@ export function WorkshopCard({
               {showBookButton && workshop.status !== "Booked" && (
                 <button
                   onClick={onBookNow}
-                  className="px-4 py-2 text-sm font-medium bg-[#9B0000] text-white rounded hover:bg-[#800000]"
+                  className="flex-1 px-4 py-2 text-sm font-medium bg-[#9B0000] text-white rounded hover:bg-[#800000] min-h-[36px] flex items-center justify-center"
                 >
                   Book Now
                 </button>
